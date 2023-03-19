@@ -1,9 +1,9 @@
+use core::num;
 use std::fmt;
+use arrayvec::ArrayVec;
 
-use enum_iterator::{all,Sequence};
 
-
-#[derive(Debug,Sequence)]
+#[derive(Clone, Copy)]
 enum Suit {
     Club,
     Diamond,
@@ -11,7 +11,11 @@ enum Suit {
     Spade
 }
 
-#[derive(Debug,Sequence)]
+impl Suit {
+    const VARIANTS: [Self; 4] = [Suit::Club, Suit::Diamond, Suit::Heart, Suit::Spade];
+}
+
+#[derive(Clone, Copy)]
 enum Value {
     Ace,
     Two,
@@ -28,16 +32,35 @@ enum Value {
     King
 }
 
+impl Value {
+    const VARIANTS: [Self; 13] = 
+        [
+            Value::Ace,
+            Value::Two,
+            Value::Three,
+            Value::Four,
+            Value::Five,
+            Value::Six,
+            Value::Seven,
+            Value::Eight,
+            Value::Nine,
+            Value::Ten,
+            Value::Jack,
+            Value::Queen,
+            Value::King
+        ];
+}
+
 struct Card {
     suit: Suit,
     value: Value
 }
 
 impl Card {
-    fn to_str(&self) -> String {
+    fn to_string(&self) -> String {
 
         let v: &str = match self.value {
-            Value::Ace =>   "1",
+            Value::Ace =>   "A",
             Value::Two =>   "2",
             Value::Three => "3",
             Value::Four =>  "4",
@@ -59,34 +82,52 @@ impl Card {
             Suit::Spade   => "S"
         };
 
-        return s.to_owned() + v
+        return v.to_owned() + s
     }
 
 }
 
 struct StandardDeck {
-    cards: [Card; 52]
+    cards: ArrayVec<Card, 52>
 }
 
 impl Default for StandardDeck {
     fn default() -> Self {
-        let cards: [Card; 52] = 0;
-        
+        let mut cards = ArrayVec::<Card, 52>::new();
+
+        for s in Suit::VARIANTS.iter().copied() {
+            for v in Value::VARIANTS.iter().copied() {
+                cards.push(Card {
+                    suit: s,
+                    value: v
+                })
+            }
+        };
+
+        Self {cards: cards}
+    }
+
+}
+
+struct Shoe {
+    cards: Vec<Card>
+}
+
+impl Shoe {
+    fn shuffled(&self, num_decks: i32) -> Self {
+
+        let mut cards = Vec::<Card>::new();
+
     }
 }
 
-impl StandardDeck {
-
-}
 
 
 fn main() {
-    println!("Hello, world!");
 
-    let c: Card = Card {
-        suit: Suit::Club,
-        value: Value::Three,
-    };
+    let deck = StandardDeck::default();
 
-    println!("{}", c.to_str())
+    for c in deck.cards {
+        println!("{}", c.to_string());
+    }
 }
